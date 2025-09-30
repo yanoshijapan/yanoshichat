@@ -443,6 +443,7 @@
     // =================================================================
     // ===== BAGIAN 1: KONFIGURASI FIREBASE (WAJIB DIISI)          =====
     // =================================================================
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
       apiKey: "AIzaSyCuOri9kZfOCrYQmuSs0AeG4rgNSx-pyt0",
       authDomain: "yanoshi-team.firebaseapp.com",
@@ -487,7 +488,7 @@
     async function openProfileModal() {
         const userDoc = await db.collection('users').doc(currentUser.uid).get();
         const userData = userDoc.data();
-        document.getElementById('modal-profile-pic').src = userData.photoURL || 'https://via.placeholder.com/100';
+        document.getElementById('modal-profile-pic').src = userData.photoURL || 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg';
         document.getElementById('modal-user-name').value = userData.name;
         document.getElementById('modal-new-password').value = '';
         document.getElementById('profile-modal').classList.add('visible');
