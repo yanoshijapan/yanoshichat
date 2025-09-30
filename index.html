@@ -15,165 +15,38 @@
             --sent-bubble: #0084ff;
             --received-bubble: #e4e6eb;
         }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            overflow: hidden;
-        }
-
-        .container {
-            display: flex;
-            height: 100vh;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* --- Bagian Autentikasi --- */
-        #auth-container {
-            display: none;
-            max-width: 400px;
-            width: 100%;
-            padding: 40px;
-            background: var(--container-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-
-        #auth-container h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: var(--primary-color);
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-sizing: border-box;
-        }
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; background-color: var(--background-color); color: var(--text-color); overflow: hidden; }
+        .container { display: flex; height: 100vh; justify-content: center; align-items: center; }
+        #auth-container { display: none; max-width: 400px; width: 100%; padding: 40px; background: var(--container-bg); border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        #auth-container h2 { text-align: center; margin-bottom: 25px; color: var(--primary-color); }
+        input { width: 100%; padding: 12px 15px; margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; }
+        input:focus { outline: none; border-color: var(--primary-color); }
+        button { width: 100%; padding: 12px; background-color: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: var(--primary-hover); }
         #auth-container p { text-align: center; margin-top: 15px; }
         #auth-container a { color: var(--primary-color); text-decoration: none; font-weight: bold; }
-        
         #signup-view { display: none; }
-
-        /* --- Bagian Chat --- */
-        #chat-container {
-            display: none;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background: var(--container-bg);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            z-index: 100;
-        }
-        
+        #chat-container { display: none; width: 100%; height: 100%; display: flex; flex-direction: column; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: var(--container-bg); box-shadow: 0 2px 5px rgba(0,0,0,0.05); z-index: 100; }
         header h1 { font-size: 20px; color: var(--primary-color); }
-
         .hamburger-menu { cursor: pointer; padding: 5px; }
         .hamburger-menu .bar { display: block; width: 25px; height: 3px; margin: 5px auto; background-color: var(--text-color); }
-        
-        nav.main-menu {
-            display: none;
-            position: fixed;
-            top: 60px;
-            right: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            list-style: none;
-            padding: 10px 0;
-        }
+        nav.main-menu { display: none; position: fixed; top: 60px; right: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); list-style: none; padding: 10px 0; }
         nav.main-menu.active { display: block; }
         nav.main-menu a { display: block; padding: 12px 25px; color: var(--text-color); text-decoration: none; }
         nav.main-menu a:hover { background-color: var(--background-color); }
-
         .chat-body { display: flex; flex-grow: 1; overflow: hidden; }
-
-        #user-list {
-            flex: 0 0 300px;
-            background: #f8f9fa;
-            border-right: 1px solid var(--border-color);
-            overflow-y: auto;
-            padding: 10px;
-        }
+        #user-list { flex: 0 0 300px; background: #f8f9fa; border-right: 1px solid var(--border-color); overflow-y: auto; padding: 10px; }
         #user-list h3 { margin: 10px; }
         #user-list ul { list-style: none; padding: 0; }
-        #user-list li {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            position: relative;
-        }
+        #user-list li { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 8px; cursor: pointer; position: relative; }
         #user-list li:hover, #user-list li.active { background-color: #e2e8f0; }
-        
         .profile-pic { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background-color: #ccc; }
-        
-        .unread-badge {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background-color: #e63946;
-            color: white;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
+        .unread-badge { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background-color: #e63946; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; }
         #chat-window { flex-grow: 1; display: flex; flex-direction: column; background: var(--container-bg); }
         #chat-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); font-weight: bold; text-align: center; }
-        
-        #welcome-screen {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: #888;
-        }
+        #welcome-screen { flex-grow: 1; display: flex; justify-content: center; align-items: center; text-align: center; color: #888; }
         #welcome-screen p { font-size: 1.2em; }
-
         #messages { flex-grow: 1; overflow-y: auto; padding: 20px; display: none; }
         .message { display: flex; margin-bottom: 15px; max-width: 70%; align-items: flex-end; gap: 10px; }
         .message.sent { margin-left: auto; flex-direction: row-reverse; }
@@ -182,25 +55,12 @@
         .message-content { display: flex; flex-direction: column; }
         .message-content .sender-name { font-size: 0.8em; color: #666; margin-bottom: 4px; }
         .message.sent .sender-name { text-align: right; }
-        
         .message-content span { padding: 10px 15px; border-radius: 18px; line-height: 1.4; }
         .message.sent span { background: var(--sent-bubble); color: white; border-bottom-right-radius: 4px; }
         .message.received span { background: var(--received-bubble); color: black; border-bottom-left-radius: 4px; }
-
-        #chat-form { display: flex; padding: 15px; border-top: 1px solid var(--border-color); gap: 10px; }
+        #chat-form { display: none; flex; padding: 15px; border-top: 1px solid var(--border-color); gap: 10px; }
         #chat-form button { width: auto; padding: 0 20px; }
-
-        /* --- Modal Edit Profil --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-overlay.visible { display: flex; }
         .modal-content { background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
         .modal-content h2 { text-align: center; }
@@ -234,7 +94,7 @@
 
     <div id="chat-container">
         <header>
-            <h1>Yanoshi Team</h1>
+            <h1>MyChat</h1>
             <div class="hamburger-menu" onclick="toggleMenu()">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -245,7 +105,6 @@
                 <a href="#" onclick="handleLogout()">Logout</a>
             </nav>
         </header>
-    
         <div class="chat-body">
             <div id="user-list">
                 <h3>Pengguna</h3>
@@ -298,6 +157,7 @@
     // =================================================================
     // ===== BAGIAN 1: KODE FIREBASE (WAJIB DIISI)                 =====
     // =================================================================
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
       apiKey: "AIzaSyCuOri9kZfOCrYQmuSs0AeG4rgNSx-pyt0",
       authDomain: "yanoshi-team.firebaseapp.com",
@@ -320,7 +180,7 @@
     let usersData = {}; 
     let unsubscribeMessages = null;
     let unsubscribeNotifications = null;
-    let unsubscribeUsers = null;
+    let unsubscribeUsers = null; // <-- Variabel baru untuk listener pengguna
 
     const authContainer = document.getElementById('auth-container');
     const chatContainer = document.getElementById('chat-container');
@@ -341,14 +201,20 @@
     }
     
     async function openProfileModal() {
-        const defaultPhotoURL = 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png';
-        const userDoc = await db.collection('users').doc(currentUser.uid).get();
-        const userData = userDoc.data();
-        document.getElementById('modal-profile-pic').src = userData.photoURL || defaultPhotoURL;
-        document.getElementById('modal-user-name').value = userData.name;
-        document.getElementById('modal-new-password').value = '';
-        document.getElementById('profile-modal').classList.add('visible');
-        toggleMenu();
+        const defaultPhotoURL = 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg';
+        try {
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                document.getElementById('modal-profile-pic').src = userData.photoURL || defaultPhotoURL;
+                document.getElementById('modal-user-name').value = userData.name;
+            }
+            document.getElementById('modal-new-password').value = '';
+            document.getElementById('profile-modal').classList.add('visible');
+            toggleMenu();
+        } catch (error) {
+            console.error("Gagal membuka modal profil:", error);
+        }
     }
 
     function closeProfileModal() {
@@ -371,10 +237,7 @@
                 name: name,
                 email: email,
                 uid: user.uid,
-                // =================================================================
-                // ===== BAGIAN 2: KODE CLOUDINARY (URL FOTO) (WAJIB DIISI)    =====
-                // =================================================================
-                photoURL: 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png',
+                photoURL: 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg',
                 isOnline: true
             });
             alert("Signup berhasil!");
@@ -397,6 +260,7 @@
         if (currentUser) {
             db.collection('users').doc(currentUser.uid).update({ isOnline: false });
         }
+        // Hentikan SEMUA listener saat logout
         if (unsubscribeNotifications) unsubscribeNotifications();
         if (unsubscribeMessages) unsubscribeMessages();
         if (unsubscribeUsers) unsubscribeUsers();
@@ -404,12 +268,8 @@
     }
 
     async function handleProfileUpdate() {
-        // =================================================================
-        // ===== BAGIAN 3: KODE CLOUDINARY (UPLOAD) (WAJIB DIISI)      =====
-        // =================================================================
         const CLOUD_NAME = "dhsbixafr";
         const UPLOAD_PRESET = "chat_app_unsigned";
-        
         const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
         
         const newName = document.getElementById('modal-user-name').value;
@@ -434,13 +294,6 @@
             
             alert('Profil berhasil diperbarui!');
             closeProfileModal();
-            await loadUsers();
-            if(selectedUserId) {
-                const updatedSelectedUserData = usersData[selectedUserId];
-                if(updatedSelectedUserData) {
-                   document.getElementById('chat-header').textContent = `Chat dengan ${updatedSelectedUserData.name}`;
-                }
-            }
         } catch (error) {
             alert('Error updating profile: ' + error.message);
             console.error(error);
@@ -448,38 +301,42 @@
     }
 
     auth.onAuthStateChanged(async user => {
-        const defaultPhotoURL = 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png';
-        // =================================================================
-        // ===== BAGIAN 4: KODE CLOUDINARY (URL AUDIO) (WAJIB DIISI)   =====
-        // =================================================================
-        const defaultAudioURL = 'https://res.cloudinary.com/demo/video/upload/cat.mp4';
+        const defaultPhotoURL = 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg';
+        const defaultAudioURL = 'https://res.cloudinary.com/dhsbixafr/video/upload/v1759203673/new-notification-09-352705_cmjazj.mp3';
         
         document.getElementById('modal-profile-pic').src = defaultPhotoURL;
         document.getElementById('notification-sound').src = defaultAudioURL;
 
         if (user) {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (!userDoc.exists) {
-                auth.signOut();
-                return;
-            }
-            currentUser = userDoc.data();
-            await db.collection('users').doc(user.uid).update({ isOnline: true });
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (!userDoc.exists) {
+                    auth.signOut();
+                    return;
+                }
+                currentUser = userDoc.data();
+                await db.collection('users').doc(user.uid).update({ isOnline: true });
                 
                 authContainer.style.display = 'none';
                 chatContainer.style.display = 'flex';
                 
-                await loadUsers();
-                listenForUnreadNotifications();
-            } catch (error) { // <-- Tambahkan catch
+                loadUsers(); // Panggil loadUsers setelah user login
+            } catch (error) {
                 console.error("Gagal memproses login pengguna:", error);
                 alert("Terjadi kesalahan saat login. Silakan coba lagi.");
-                auth.signOut(); // Logout paksa jika terjadi error
+                auth.signOut();
             }
         } else {
             currentUser = null;
+            selectedUserId = null; // Reset user yang dipilih
             chatContainer.style.display = 'none';
             authContainer.style.display = 'block';
+        }
+    });
+    
+    window.addEventListener('beforeunload', () => {
+        if (currentUser) {
+            db.collection('users').doc(currentUser.uid).update({ isOnline: false });
         }
     });
 
@@ -495,37 +352,30 @@
 
     function loadUsers() {
         const usersList = document.getElementById('users');
-        
-        // Hentikan listener lama (jika ada) sebelum membuat yang baru untuk mencegah duplikasi
         if (unsubscribeUsers) unsubscribeUsers(); 
-    
-        // Mulai listener baru dan simpan fungsi 'unsubscribe'-nya ke variabel global
+
         unsubscribeUsers = db.collection('users').onSnapshot(snapshot => {
-            // Simpan user yang sedang dipilih agar tidak hilang saat daftar diperbarui
             const currentSelectedId = selectedUserId;
-            usersList.innerHTML = ''; // Kosongkan daftar setiap kali ada pembaruan
-            usersData = {}; // Bangun ulang cache data pengguna
+            usersList.innerHTML = ''; 
+            usersData = {}; 
             
             snapshot.forEach(doc => {
                 const user = doc.data();
-                usersData[user.uid] = user; // Simpan data terbaru ke cache
+                usersData[user.uid] = user;
                 
-                // Tampilkan semua pengguna kecuali diri sendiri
                 if (currentUser && user.uid !== currentUser.uid) {
                     const li = document.createElement('li');
                     li.setAttribute('data-uid', user.uid);
                     
-                    // Jika pengguna ini adalah yang sedang aktif di chat, beri kelas 'active'
                     if (user.uid === currentSelectedId) {
                         li.classList.add('active');
                     }
-    
+
                     li.onclick = () => selectUserForChat(user.uid, user.name);
                     
-                    // Pastikan Anda sudah mengisi URL default di bagian konfigurasi
-                    const defaultPhotoURL = 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png';
+                    const defaultPhotoURL = 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg';
                     const thumbUrl = getTransformedImageUrl(user.photoURL || defaultPhotoURL, 'w_45,h_45,c_fill,g_face');
-    
+
                     li.innerHTML = `
                         <img src="${thumbUrl}" class="profile-pic">
                         <span>${user.name}</span>
@@ -534,75 +384,61 @@
                     usersList.appendChild(li);
                 }
             });
-    
-            // Panggil kembali fungsi update notifikasi setelah daftar pengguna selesai diperbarui
-            updateUnreadBadgesFromListener();
+            listenForUnreadNotifications();
+        }, error => {
+            console.error("Gagal memuat daftar pengguna:", error);
         });
     }
 
-    function updateUnreadBadgesFromListener() {
-        if (!currentUser) return;
-        
-        if(unsubscribeNotifications) unsubscribeNotifications();
-        unsubscribeNotifications = db.collectionGroup('messages')
-            .where('receiverId', '==', currentUser.uid)
-            .where('isRead', '==', false)
-            .onSnapshot(snapshot => {
-                const unreadCounts = {};
-                snapshot.forEach(doc => {
-                    const message = doc.data();
-                    unreadCounts[message.senderId] = (unreadCounts[message.senderId] || 0) + 1;
-                });
-                updateUnreadBadges(unreadCounts);
-            });
-    }
     async function selectUserForChat(uid, name) {
         selectedUserId = uid;
         const messagesDiv = document.getElementById('messages');
         
-        // ===== BARIS KUNCI TAMBAHAN =====
-        // Kosongkan layar chat dari pesan sebelumnya sebelum memuat yang baru
         messagesDiv.innerHTML = ''; 
-        // ================================
-    
+
         document.getElementById('welcome-screen').style.display = 'none';
         messagesDiv.style.display = 'block';
         document.getElementById('chat-header').textContent = `Chat dengan ${name}`;
         document.getElementById('chat-form').style.display = 'flex';
-    
+
         document.querySelectorAll('#user-list li').forEach(li => {
             li.classList.remove('active');
             if (li.getAttribute('data-uid') === uid) {
                 li.classList.add('active');
                 const badge = li.querySelector('.unread-badge');
-                if (badge) badge.style.display = 'none';
+                if(badge) badge.style.display = 'none';
             }
         });
         
-        await markMessagesAsRead(uid);
-        loadMessages(); // Muat pesan untuk pengguna yang baru dipilih
+        try {
+            await markMessagesAsRead(uid);
+            loadMessages();
+        } catch (error) {
+            console.error("Gagal menandai pesan sebagai terbaca:", error);
+        }
     }
+
     function loadMessages() {
         const messagesDiv = document.getElementById('messages');
         if (unsubscribeMessages) unsubscribeMessages();
-    
+
         const chatId = [currentUser.uid, selectedUserId].sort().join('_');
         unsubscribeMessages = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp')
             .onSnapshot(snapshot => {
-                // Hanya proses dokumen yang baru ditambahkan
                 snapshot.docChanges().forEach(change => {
                     if (change.type === "added") {
                         const message = change.doc.data();
-                        displayMessage(message); // Panggil fungsi untuk menampilkan satu pesan
+                        displayMessage(message);
                     }
                 });
-                // Auto-scroll ke pesan terbaru
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }, error => {
+                console.error("Gagal memuat pesan:", error);
             });
     }
     
     function displayMessage(message) {
-        const defaultPhotoURL = 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png'; // Pastikan URL ini sesuai dengan milik Anda
+        const defaultPhotoURL = 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg';
         const messagesDiv = document.getElementById('messages');
         const messageEl = document.createElement('div');
         messageEl.classList.add('message');
@@ -611,9 +447,9 @@
         const isSent = message.senderId === currentUser.uid;
         messageEl.classList.add(isSent ? 'sent' : 'received');
         
-        const rawPhotoUrl = isSent ? currentUser.photoURL : (sender ? sender.photoURL : defaultPhotoUrl);
+        const rawPhotoUrl = isSent ? currentUser.photoURL : (sender ? sender.photoURL : defaultPhotoURL);
         const chatPicUrl = getTransformedImageUrl(rawPhotoUrl, 'w_30,h_30,c_fill,g_face');
-    
+
         messageEl.innerHTML = `
             <img src="${chatPicUrl}" class="profile-pic">
             <div class="message-content">
@@ -621,7 +457,6 @@
                 <span>${message.text}</span>
             </div>
         `;
-        // Gunakan appendChild untuk menambahkan elemen baru, bukan menghapus yang lama
         messagesDiv.appendChild(messageEl);
     }
 
@@ -646,7 +481,9 @@
     }
     
     function listenForUnreadNotifications() {
-        if(unsubscribeNotifications) unsubscribeNotifications();
+        if (!currentUser) return;
+        if (unsubscribeNotifications) unsubscribeNotifications();
+        
         unsubscribeNotifications = db.collectionGroup('messages')
             .where('receiverId', '==', currentUser.uid)
             .where('isRead', '==', false)
@@ -657,6 +494,8 @@
                     unreadCounts[message.senderId] = (unreadCounts[message.senderId] || 0) + 1;
                 });
                 updateUnreadBadges(unreadCounts);
+            }, error => {
+                console.error("Gagal mendengarkan notifikasi:", error);
             });
     }
 
@@ -686,15 +525,6 @@
         });
         await batch.commit();
     }
-    window.addEventListener('beforeunload', (event) => {
-        // Fungsi ini akan mencoba berjalan saat tab ditutup
-        if (currentUser) {
-            // Ini tidak selalu dijamin berjalan, tetapi merupakan upaya terbaik
-            // tanpa solusi yang lebih kompleks.
-            db.collection('users').doc(currentUser.uid).update({ isOnline: false });
-        }
-    });
-    
 </script>
 
 </body>
