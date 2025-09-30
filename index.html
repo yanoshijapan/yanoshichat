@@ -547,29 +547,27 @@
         loadMessages();
     }
 
-    function loadMessages() {
+   function loadMessages() {
         const messagesDiv = document.getElementById('messages');
         if (unsubscribeMessages) unsubscribeMessages();
-
+    
         const chatId = [currentUser.uid, selectedUserId].sort().join('_');
         unsubscribeMessages = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp')
             .onSnapshot(snapshot => {
-                messagesDiv.innerHTML = '';
+                // Hanya proses dokumen yang baru ditambahkan
                 snapshot.docChanges().forEach(change => {
                     if (change.type === "added") {
                         const message = change.doc.data();
-                        displayMessage(message);
-                        if (message.receiverId === currentUser.uid && (document.hidden || selectedUserId !== message.senderId)) {
-                            notificationSound.play().catch(e => {});
-                        }
+                        displayMessage(message); // Panggil fungsi untuk menampilkan satu pesan
                     }
                 });
+                // Auto-scroll ke pesan terbaru
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             });
     }
     
     function displayMessage(message) {
-        const defaultPhotoURL = 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png';
+        const defaultPhotoURL = 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png'; // Pastikan URL ini sesuai dengan milik Anda
         const messagesDiv = document.getElementById('messages');
         const messageEl = document.createElement('div');
         messageEl.classList.add('message');
@@ -578,9 +576,9 @@
         const isSent = message.senderId === currentUser.uid;
         messageEl.classList.add(isSent ? 'sent' : 'received');
         
-        const rawPhotoUrl = isSent ? currentUser.photoURL : (sender ? sender.photoURL : defaultPhotoURL);
+        const rawPhotoUrl = isSent ? currentUser.photoURL : (sender ? sender.photoURL : defaultPhotoUrl);
         const chatPicUrl = getTransformedImageUrl(rawPhotoUrl, 'w_30,h_30,c_fill,g_face');
-
+    
         messageEl.innerHTML = `
             <img src="${chatPicUrl}" class="profile-pic">
             <div class="message-content">
@@ -588,6 +586,7 @@
                 <span>${message.text}</span>
             </div>
         `;
+        // Gunakan appendChild untuk menambahkan elemen baru, bukan menghapus yang lama
         messagesDiv.appendChild(messageEl);
     }
 
