@@ -320,6 +320,7 @@
     let usersData = {}; 
     let unsubscribeMessages = null;
     let unsubscribeNotifications = null;
+    let unsubscribeUsers = null;
 
     const authContainer = document.getElementById('auth-container');
     const chatContainer = document.getElementById('chat-container');
@@ -398,6 +399,7 @@
         }
         if (unsubscribeNotifications) unsubscribeNotifications();
         if (unsubscribeMessages) unsubscribeMessages();
+        if (unsubscribeUsers) unsubscribeUsers();
         auth.signOut();
     }
 
@@ -463,12 +465,17 @@
             }
             currentUser = userDoc.data();
             await db.collection('users').doc(user.uid).update({ isOnline: true });
-            
-            authContainer.style.display = 'none';
-            chatContainer.style.display = 'flex';
-            
-            await loadUsers();
-            listenForUnreadNotifications();
+                
+                authContainer.style.display = 'none';
+                chatContainer.style.display = 'flex';
+                
+                await loadUsers();
+                listenForUnreadNotifications();
+            } catch (error) { // <-- Tambahkan catch
+                console.error("Gagal memproses login pengguna:", error);
+                alert("Terjadi kesalahan saat login. Silakan coba lagi.");
+                auth.signOut(); // Logout paksa jika terjadi error
+            }
         } else {
             currentUser = null;
             chatContainer.style.display = 'none';
@@ -489,25 +496,34 @@
     function loadUsers() {
         const usersList = document.getElementById('users');
         
-        // Menggunakan .onSnapshot() untuk mendengarkan perubahan real-time
-        db.collection('users').onSnapshot(snapshot => {
-            usersList.innerHTML = ''; // Kosongkan daftar setiap ada pembaruan
-            usersData = {}; // Bangun ulang data pengguna
+        // Hentikan listener lama (jika ada) sebelum membuat yang baru untuk mencegah duplikasi
+        if (unsubscribeUsers) unsubscribeUsers(); 
+    
+        // Mulai listener baru dan simpan fungsi 'unsubscribe'-nya ke variabel global
+        unsubscribeUsers = db.collection('users').onSnapshot(snapshot => {
+            // Simpan user yang sedang dipilih agar tidak hilang saat daftar diperbarui
+            const currentSelectedId = selectedUserId;
+            usersList.innerHTML = ''; // Kosongkan daftar setiap kali ada pembaruan
+            usersData = {}; // Bangun ulang cache data pengguna
             
             snapshot.forEach(doc => {
                 const user = doc.data();
-                usersData[user.uid] = user; // Simpan data terbaru
+                usersData[user.uid] = user; // Simpan data terbaru ke cache
                 
+                // Tampilkan semua pengguna kecuali diri sendiri
                 if (currentUser && user.uid !== currentUser.uid) {
                     const li = document.createElement('li');
                     li.setAttribute('data-uid', user.uid);
-                    // Menambahkan kelas 'active' jika user ini sedang dipilih
-                    if (user.uid === selectedUserId) {
+                    
+                    // Jika pengguna ini adalah yang sedang aktif di chat, beri kelas 'active'
+                    if (user.uid === currentSelectedId) {
                         li.classList.add('active');
                     }
+    
                     li.onclick = () => selectUserForChat(user.uid, user.name);
                     
-                    const defaultPhotoURL = 'URL_FOTO_DEFAULT_DARI_CLOUDINARY_ANDA'; // Pastikan URL ini diisi
+                    // Pastikan Anda sudah mengisi URL default di bagian konfigurasi
+                    const defaultPhotoURL = 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png';
                     const thumbUrl = getTransformedImageUrl(user.photoURL || defaultPhotoURL, 'w_45,h_45,c_fill,g_face');
     
                     li.innerHTML = `
@@ -518,15 +534,28 @@
                     usersList.appendChild(li);
                 }
             });
-            // Setelah daftar pengguna diperbarui, perbarui juga notifikasi
-            // Ini memastikan notifikasi tetap ada bahkan setelah daftar di-refresh
-            if(unsubscribeNotifications) {
-                // Panggil ulang listener notifikasi untuk refresh data
-                listenForUnreadNotifications();
-            }
+    
+            // Panggil kembali fungsi update notifikasi setelah daftar pengguna selesai diperbarui
+            updateUnreadBadgesFromListener();
         });
     }
 
+    function updateUnreadBadgesFromListener() {
+        if (!currentUser) return;
+        
+        if(unsubscribeNotifications) unsubscribeNotifications();
+        unsubscribeNotifications = db.collectionGroup('messages')
+            .where('receiverId', '==', currentUser.uid)
+            .where('isRead', '==', false)
+            .onSnapshot(snapshot => {
+                const unreadCounts = {};
+                snapshot.forEach(doc => {
+                    const message = doc.data();
+                    unreadCounts[message.senderId] = (unreadCounts[message.senderId] || 0) + 1;
+                });
+                updateUnreadBadges(unreadCounts);
+            });
+    }
     async function selectUserForChat(uid, name) {
         selectedUserId = uid;
         const messagesDiv = document.getElementById('messages');
@@ -657,6 +686,15 @@
         });
         await batch.commit();
     }
+    window.addEventListener('beforeunload', (event) => {
+        // Fungsi ini akan mencoba berjalan saat tab ditutup
+        if (currentUser) {
+            // Ini tidak selalu dijamin berjalan, tetapi merupakan upaya terbaik
+            // tanpa solusi yang lebih kompleks.
+            db.collection('users').doc(currentUser.uid).update({ isOnline: false });
+        }
+    });
+    
 </script>
 
 </body>
