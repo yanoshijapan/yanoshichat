@@ -529,25 +529,31 @@
 
     async function selectUserForChat(uid, name) {
         selectedUserId = uid;
+        const messagesDiv = document.getElementById('messages');
+        
+        // ===== BARIS KUNCI TAMBAHAN =====
+        // Kosongkan layar chat dari pesan sebelumnya sebelum memuat yang baru
+        messagesDiv.innerHTML = ''; 
+        // ================================
+    
         document.getElementById('welcome-screen').style.display = 'none';
-        document.getElementById('messages').style.display = 'block';
+        messagesDiv.style.display = 'block';
         document.getElementById('chat-header').textContent = `Chat dengan ${name}`;
         document.getElementById('chat-form').style.display = 'flex';
-
+    
         document.querySelectorAll('#user-list li').forEach(li => {
             li.classList.remove('active');
             if (li.getAttribute('data-uid') === uid) {
                 li.classList.add('active');
                 const badge = li.querySelector('.unread-badge');
-                if(badge) badge.style.display = 'none';
+                if (badge) badge.style.display = 'none';
             }
         });
         
         await markMessagesAsRead(uid);
-        loadMessages();
+        loadMessages(); // Muat pesan untuk pengguna yang baru dipilih
     }
-
-   function loadMessages() {
+    function loadMessages() {
         const messagesDiv = document.getElementById('messages');
         if (unsubscribeMessages) unsubscribeMessages();
     
