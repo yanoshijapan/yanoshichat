@@ -486,28 +486,43 @@
         return `${parts[0]}/upload/${transformations}/${parts[1]}`;
     }
 
-    async function loadUsers() {
-        const defaultPhotoURL = 'https://res.cloudinary.com/demo/image/upload/w_100,h_100,c_thumb,g_face,r_max/face_top.png';
+    function loadUsers() {
         const usersList = document.getElementById('users');
-        usersList.innerHTML = '';
-        usersData = {};
-        const snapshot = await db.collection('users').get();
-        snapshot.forEach(doc => {
-            const user = doc.data();
-            usersData[user.uid] = user;
-            if (user.uid !== currentUser.uid) {
-                const li = document.createElement('li');
-                li.setAttribute('data-uid', user.uid);
-                li.onclick = () => selectUserForChat(user.uid, user.name);
+        
+        // Menggunakan .onSnapshot() untuk mendengarkan perubahan real-time
+        db.collection('users').onSnapshot(snapshot => {
+            usersList.innerHTML = ''; // Kosongkan daftar setiap ada pembaruan
+            usersData = {}; // Bangun ulang data pengguna
+            
+            snapshot.forEach(doc => {
+                const user = doc.data();
+                usersData[user.uid] = user; // Simpan data terbaru
                 
-                const thumbUrl = getTransformedImageUrl(user.photoURL || defaultPhotoURL, 'w_45,h_45,c_fill,g_face');
-
-                li.innerHTML = `
-                    <img src="${thumbUrl}" class="profile-pic">
-                    <span>${user.name}</span>
-                    <span class="unread-badge" style="display:none;">0</span>
-                `;
-                usersList.appendChild(li);
+                if (currentUser && user.uid !== currentUser.uid) {
+                    const li = document.createElement('li');
+                    li.setAttribute('data-uid', user.uid);
+                    // Menambahkan kelas 'active' jika user ini sedang dipilih
+                    if (user.uid === selectedUserId) {
+                        li.classList.add('active');
+                    }
+                    li.onclick = () => selectUserForChat(user.uid, user.name);
+                    
+                    const defaultPhotoURL = 'URL_FOTO_DEFAULT_DARI_CLOUDINARY_ANDA'; // Pastikan URL ini diisi
+                    const thumbUrl = getTransformedImageUrl(user.photoURL || defaultPhotoURL, 'w_45,h_45,c_fill,g_face');
+    
+                    li.innerHTML = `
+                        <img src="${thumbUrl}" class="profile-pic">
+                        <span>${user.name}</span>
+                        <span class="unread-badge" style="display:none;">0</span>
+                    `;
+                    usersList.appendChild(li);
+                }
+            });
+            // Setelah daftar pengguna diperbarui, perbarui juga notifikasi
+            // Ini memastikan notifikasi tetap ada bahkan setelah daftar di-refresh
+            if(unsubscribeNotifications) {
+                // Panggil ulang listener notifikasi untuk refresh data
+                listenForUnreadNotifications();
             }
         });
     }
