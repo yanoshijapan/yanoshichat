@@ -419,7 +419,7 @@
         <h2>Edit Profil</h2>
         <div class="profile-pic-editor">
             <label for="profile-pic-upload">
-                <img id="modal-profile-pic" src="https://via.placeholder.com/100" alt="Profile Picture">
+                <img id="modal-profile-pic" src="https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg" alt="Profile Picture">
             </label>
             <input type="file" id="profile-pic-upload" accept="image/*">
             <small>Klik gambar untuk mengubah</small>
@@ -657,7 +657,7 @@
                 li.setAttribute('data-uid', user.uid);
                 li.onclick = () => selectUserForChat(user.uid, user.name);
                 
-                const rawPhotoUrl = user.photoURL || 'https://via.placeholder.com/45';
+                const rawPhotoUrl = user.photoURL || 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg';
                 const thumbUrl = getTransformedImageUrl(rawPhotoUrl, 'w_45,h_45,c_fill,g_face');
 
                 li.innerHTML = `
@@ -721,7 +721,7 @@
         
         messageEl.classList.add(isSent ? 'sent' : 'received');
         
-        const rawPhotoUrl = isSent ? currentUser.photoURL : (sender ? sender.photoURL : 'https://via.placeholder.com/30');
+        const rawPhotoUrl = isSent ? currentUser.photoURL : (sender ? sender.photoURL : 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg');
         const chatPicUrl = getTransformedImageUrl(rawPhotoUrl, 'w_30,h_30,c_fill,g_face');
 
         messageEl.innerHTML = `
