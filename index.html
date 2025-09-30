@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Web Chat</title>
+    <style>
+        /* CSS Modern dengan Animasi dan Desain Responsif */
+        :root {
+            --primary-color: #007BFF;
+            --primary-hover: #0056b3;
+            --background-color: #f0f2f5;
+            --container-bg: #ffffff;
+            --text-color: #333;
+            --light-gray: #e9e9eb;
+            --border-color: #ddd;
+            --sent-bubble: #0084ff;
+            --received-bubble: #e4e6eb;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            overflow: hidden; /* Mencegah scroll di body */
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Bagian Autentikasi --- */
+        #auth-container {
+            max-width: 400px;
+            width: 100%;
+            padding: 40px;
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+        
+        #auth-container.hidden {
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+        }
+
+        #auth-container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+
+        #auth-container p {
+            text-align: center;
+            margin-top: 15px;
+        }
+        #auth-container a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        #signup-view { display: none; }
+
+        /* --- Bagian Chat --- */
+        #chat-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        #chat-container.visible {
+            opacity: 1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: var(--container-bg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        
+        header h1 {
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+
+        .hamburger-menu {
+            cursor: pointer;
+            padding: 5px;
+        }
+        .hamburger-menu .bar {
+            display: block;
+            width: 25px;
+            height: 3px;
+            margin: 5px auto;
+            background-color: var(--text-color);
+            transition: 0.3s;
+        }
+        
+        nav.main-menu {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            list-style: none;
+            padding: 10px 0;
+            transform: translateY(-20px) scale(0.95);
+            opacity: 0;
+            visibility: hidden;
+            transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s;
+        }
+        nav.main-menu.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+        nav.main-menu a {
+            display: block;
+            padding: 12px 25px;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        nav.main-menu a:hover {
+            background-color: var(--background-color);
+        }
+
+        .chat-body {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        #user-list {
+            flex: 0 0 300px;
+            background: #f8f9fa;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 10px;
+        }
+        #user-list h3 { margin: 10px; }
+        #user-list ul { list-style: none; padding: 0; }
+        #user-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+        #user-list li:hover, #user-list li.active {
+            background-color: #e2e8f0;
+        }
+        
+        .profile-pic {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #ccc;
+        }
+        
+        .unread-badge {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #e63946;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        #chat-window {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--container-bg);
+        }
+
+        #chat-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        #welcome-screen {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #888;
+        }
+        #welcome-screen p { font-size: 1.2em; }
+
+        #messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: none;
+        }
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            max-width: 70%;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        .message.sent {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+        .message.received {
+            margin-right: auto;
+        }
+        .message .profile-pic { width: 30px; height: 30px; }
+        .message-content {
+            display: flex;
+            flex-direction: column;
+        }
+        .message-content .sender-name {
+            font-size: 0.8em;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .message.sent .sender-name { text-align: right; }
+        
+        .message-content span {
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+        }
+        .message.sent span {
+            background: var(--sent-bubble);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.received span {
+            background: var(--received-bubble);
+            color: black;
+            border-bottom-left-radius: 4px;
+        }
+
+        #chat-form {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            gap: 10px;
+        }
+        
+        #chat-form button { width: auto; padding: 0 20px; }
+
+        /* --- Modal Edit Profil --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 400px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+        .modal-content h2 { text-align: center; }
+        .profile-pic-editor { text-align: center; margin-bottom: 20px; }
+        .profile-pic-editor img {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 2px solid var(--border-color);
+        }
+        #profile-pic-upload { display: none; }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .modal-actions button[type="button"] { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="auth-container">
+        <div id="login-view">
+            <h2>Login</h2>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="handleLogin()">Login</button>
+            <p>Belum punya akun? <a href="#" onclick="toggleView()">Signup di sini</a></p>
+        </div>
+        <div id="signup-view">
+            <h2>Signup</h2>
+            <input type="text" id="signup-name" placeholder="Nama Anda">
+            <input type="email" id="signup-email" placeholder="Email">
+            <input type="password" id="signup-password" placeholder="Password">
+            <button onclick="handleSignup()">Signup</button>
+            <p>Sudah punya akun? <a href="#" onclick="toggleView()">Login di sini</a></p>
+        </div>
+    </div>
+
+    <div id="chat-container">
+        <header>
+            <h1>MyChat</h1>
+            <div class="hamburger-menu" onclick="toggleMenu()">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <nav class="main-menu" id="main-menu">
+                <a href="#" onclick="openProfileModal()">Edit Profil</a>
+                <a href="#" onclick="handleLogout()">Logout</a>
+            </nav>
+        </header>
+
+        <div class="chat-body">
+            <div id="user-list">
+                <h3>Pengguna</h3>
+                <ul id="users"></ul>
+            </div>
+            <div id="chat-window">
+                 <div id="welcome-screen">
+                     <div>
+                        <h2>Selamat Datang!</h2>
+                        <p>Pilih pengguna di sebelah kiri untuk memulai percakapan.</p>
+                     </div>
+                 </div>
+                 <div id="messages"></div>
+                 <div id="chat-form" style="display:none;">
+                     <input type="text" id="message-input" placeholder="Ketik pesan..." onkeydown="if(event.key==='Enter') sendMessage()">
+                     <button onclick="sendMessage()">Kirim</button>
+                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="profile-modal">
+    <div class="modal-content">
+        <h2>Edit Profil</h2>
+        <div class="profile-pic-editor">
+            <label for="profile-pic-upload">
+                <img id="modal-profile-pic" src="https://via.placeholder.com/100" alt="Profile Picture">
+            </label>
+            <input type="file" id="profile-pic-upload" accept="image/*">
+            <small>Klik gambar untuk mengubah</small>
+        </div>
+        <input type="text" id="modal-user-name" placeholder="Nama Anda">
+        <input type="password" id="modal-new-password" placeholder="Password Baru (opsional)">
+        <div class="modal-actions">
+            <button type="button" onclick="closeProfileModal()">Batal</button>
+            <button onclick="handleProfileUpdate()">Simpan Perubahan</button>
+        </div>
+    </div>
+</div>
+
+<audio id="notification-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+<script>
+    // =================================================================
+    // ===== BAGIAN 1: KONFIGURASI FIREBASE (WAJIB DIISI)          =====
+    // =================================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyCuOri9kZfOCrYQmuSs0AeG4rgNSx-pyt0",
+      authDomain: "yanoshi-team.firebaseapp.com",
+      projectId: "yanoshi-team",
+      storageBucket: "yanoshi-team.firebasestorage.app",
+      messagingSenderId: "789314538139",
+      appId: "1:789314538139:web:4911234c07b0d06eb3943e",
+      measurementId: "G-7JX915SWVQ"
+    };
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // ==============================================================
+    // ===== VARIABEL GLOBAL & REFERENSI ELEMEN DOM =================
+    // ==============================================================
+    let currentUser = null;
+    let selectedUserId = null;
+    let usersData = {}; 
+    let unsubscribeMessages = null;
+    let unsubscribeNotifications = null;
+
+    const authContainer = document.getElementById('auth-container');
+    const chatContainer = document.getElementById('chat-container');
+    const loginView = document.getElementById('login-view');
+    const signupView = document.getElementById('signup-view');
+    const notificationSound = document.getElementById('notification-sound');
+
+    // ==============================================================
+    // ===== FUNGSI UI (MENU, MODAL, TOGGLE VIEW) ===================
+    // ==============================================================
+    function toggleView() {
+        loginView.style.display = loginView.style.display === 'none' ? 'block' : 'none';
+        signupView.style.display = signupView.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleMenu() {
+        document.getElementById('main-menu').classList.toggle('active');
+    }
+    
+    async function openProfileModal() {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const userData = userDoc.data();
+        document.getElementById('modal-profile-pic').src = userData.photoURL || 'https://via.placeholder.com/100';
+        document.getElementById('modal-user-name').value = userData.name;
+        document.getElementById('modal-new-password').value = '';
+        document.getElementById('profile-modal').classList.add('visible');
+        toggleMenu();
+    }
+
+    function closeProfileModal() {
+        document.getElementById('profile-modal').classList.remove('visible');
+    }
+
+    // ==============================================================
+    // ===== FUNGSI AUTENTIKASI & PROFIL ============================
+    // ==============================================================
+    async function handleSignup() {
+        const name = document.getElementById('signup-name').value;
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+        if (!name || !email || !password) return alert("Harap isi semua kolom!");
+
+        try {
+            const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+            await db.collection('users').doc(user.uid).set({
+                name: name,
+                email: email,
+                uid: user.uid,
+                // =================================================================
+                // ===== BAGIAN 2: URL FOTO PROFIL DEFAULT (WAJIB DIISI)       =====
+                // =================================================================
+                photoURL: 'https://res.cloudinary.com/dhsbixafr/image/upload/v1759200611/vecteezy_user-avatar-line-style__lt14z4.jpg', // <-- GANTI DENGAN URL FOTO DARI CLOUDINARY
+                isOnline: true
+            });
+            alert("Signup berhasil!");
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    }
+
+    async function handleLogin() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    }
+
+    function handleLogout() {
+        if (currentUser) {
+            db.collection('users').doc(currentUser.uid).update({ isOnline: false });
+        }
+        if (unsubscribeNotifications) unsubscribeNotifications();
+        if (unsubscribeMessages) unsubscribeMessages();
+        auth.signOut();
+    }
+
+    async function handleProfileUpdate() {
+        // =================================================================
+        // ===== BAGIAN 3: KONFIGURASI CLOUDINARY (WAJIB DIISI)        =====
+        // =================================================================
+        const CLOUD_NAME = "dhsbixafr";
+        const UPLOAD_PRESET = "chat_app_unsigned"; // contoh: "chat_app_unsigned"
+        
+        const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+        
+        const newName = document.getElementById('modal-user-name').value;
+        const newPassword = document.getElementById('modal-new-password').value;
+        const file = document.getElementById('profile-pic-upload').files[0];
+        
+        try {
+            let photoURL = document.getElementById('modal-profile-pic').src;
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', UPLOAD_PRESET);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Upload ke Cloudinary gagal!');
+                
+                const data = await response.json();
+                photoURL = data.secure_url;
+            }
+
+            await db.collection('users').doc(currentUser.uid).update({
+                name: newName,
+                photoURL: photoURL
+            });
+            
+            if (newPassword) {
+                await auth.currentUser.updatePassword(newPassword);
+            }
+            
+            alert('Profil berhasil diperbarui!');
+            closeProfileModal();
+            await loadUsers();
+            if(selectedUserId) {
+                const updatedSelectedUserData = usersData[selectedUserId];
+                if(updatedSelectedUserData) {
+                   document.getElementById('chat-header').textContent = `Chat dengan ${updatedSelectedUserData.name}`;
+                }
+            }
+        } catch (error) {
+            alert('Error updating profile: ' + error.message);
+            console.error(error);
+        }
+    }
+
+
+    auth.onAuthStateChanged(async user => {
+        if (user) {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (!userDoc.exists) {
+                console.log("Dokumen user tidak ditemukan, proses logout.");
+                auth.signOut();
+                return;
+            }
+            currentUser = userDoc.data();
+            await db.collection('users').doc(user.uid).update({ isOnline: true });
+            
+            authContainer.classList.add('hidden');
+            setTimeout(() => {
+                authContainer.style.display = 'none';
+                chatContainer.style.display = 'flex';
+                chatContainer.classList.add('visible');
+            }, 500);
+            
+            await loadUsers();
+            listenForUnreadNotifications();
+        } else {
+            currentUser = null;
+            chatContainer.classList.remove('visible');
+             setTimeout(() => {
+                chatContainer.style.display = 'none';
+                authContainer.style.display = 'block';
+                authContainer.classList.remove('hidden');
+            }, 500);
+        }
+    });
+
+    // ==============================================================
+    // ===== FUNGSI-FUNGSI CHAT & TRANSFORMASI GAMBAR ===============
+    // ==============================================================
+    function getTransformedImageUrl(url, transformations) {
+        if (!url || !url.includes('cloudinary.com')) {
+            return url;
+        }
+        const parts = url.split('/upload/');
+        if (parts.length < 2) return url;
+        return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+    }
+
+    async function loadUsers() {
+        const usersList = document.getElementById('users');
+        usersList.innerHTML = '';
+        usersData = {};
+        const snapshot = await db.collection('users').get();
+        snapshot.forEach(doc => {
+            const user = doc.data();
+            usersData[user.uid] = user;
+            if (user.uid !== currentUser.uid) {
+                const li = document.createElement('li');
+                li.setAttribute('data-uid', user.uid);
+                li.onclick = () => selectUserForChat(user.uid, user.name);
+                
+                const rawPhotoUrl = user.photoURL || 'https://via.placeholder.com/45';
+                const thumbUrl = getTransformedImageUrl(rawPhotoUrl, 'w_45,h_45,c_fill,g_face');
+
+                li.innerHTML = `
+                    <img src="${thumbUrl}" class="profile-pic">
+                    <span>${user.name}</span>
+                    <span class="unread-badge" style="display:none;">0</span>
+                `;
+                usersList.appendChild(li);
+            }
+        });
+    }
+
+    async function selectUserForChat(uid, name) {
+        selectedUserId = uid;
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('messages').style.display = 'block';
+        document.getElementById('chat-header').textContent = `Chat dengan ${name}`;
+        document.getElementById('chat-form').style.display = 'flex';
+
+        document.querySelectorAll('#user-list li').forEach(li => {
+            li.classList.remove('active');
+            if (li.getAttribute('data-uid') === uid) {
+                li.classList.add('active');
+                const badge = li.querySelector('.unread-badge');
+                if(badge) badge.style.display = 'none';
+            }
+        });
+        
+        await markMessagesAsRead(uid);
+        loadMessages();
+    }
+
+    function loadMessages() {
+        const messagesDiv = document.getElementById('messages');
+        if (unsubscribeMessages) unsubscribeMessages();
+
+        const chatId = [currentUser.uid, selectedUserId].sort().join('_');
+        unsubscribeMessages = db.collection('chats').doc(chatId).collection('messages').orderBy('timestamp')
+            .onSnapshot(snapshot => {
+                messagesDiv.innerHTML = '';
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === "added") {
+                        const message = change.doc.data();
+                        displayMessage(message);
+                        if (message.receiverId === currentUser.uid && (document.hidden || selectedUserId !== message.senderId)) {
+                            notificationSound.play().catch(e => {});
+                        }
+                    }
+                });
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+    }
+    
+    function displayMessage(message) {
+        const messagesDiv = document.getElementById('messages');
+        const messageEl = document.createElement('div');
+        messageEl.classList.add('message');
+        
+        const sender = usersData[message.senderId];
+        const isSent = message.senderId === currentUser.uid;
+        
+        messageEl.classList.add(isSent ? 'sent' : 'received');
+        
+        const rawPhotoUrl = isSent ? currentUser.photoURL : (sender ? sender.photoURL : 'https://via.placeholder.com/30');
+        const chatPicUrl = getTransformedImageUrl(rawPhotoUrl, 'w_30,h_30,c_fill,g_face');
+
+        messageEl.innerHTML = `
+            <img src="${chatPicUrl}" class="profile-pic">
+            <div class="message-content">
+                <div class="sender-name">${isSent ? 'Anda' : (sender ? sender.name : 'Unknown')}</div>
+                <span>${message.text}</span>
+            </div>
+        `;
+        messagesDiv.appendChild(messageEl);
+    }
+
+    async function sendMessage() {
+        const messageInput = document.getElementById('message-input');
+        const text = messageInput.value.trim();
+        if (text === '' || !selectedUserId) return;
+
+        const chatId = [currentUser.uid, selectedUserId].sort().join('_');
+        try {
+            await db.collection('chats').doc(chatId).collection('messages').add({
+                text: text,
+                senderId: currentUser.uid,
+                receiverId: selectedUserId,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                isRead: false
+            });
+            messageInput.value = '';
+        } catch (error) {
+            console.error("Error sending message: ", error);
+        }
+    }
+    
+    // ==============================================================
+    // ===== FUNGSI NOTIFIKASI PESAN BELUM DIBACA ===================
+    // ==============================================================
+    function listenForUnreadNotifications() {
+        if(unsubscribeNotifications) unsubscribeNotifications();
+
+        unsubscribeNotifications = db.collectionGroup('messages')
+            .where('receiverId', '==', currentUser.uid)
+            .where('isRead', '==', false)
+            .onSnapshot(snapshot => {
+                const unreadCounts = {};
+                let hasNewMessage = false;
+                snapshot.docChanges().forEach(change => {
+                    if (change.type === 'added') hasNewMessage = true;
+                });
+
+                snapshot.forEach(doc => {
+                    const message = doc.data();
+                    unreadCounts[message.senderId] = (unreadCounts[message.senderId] || 0) + 1;
+                });
+                
+                if (hasNewMessage && document.hidden) {
+                   notificationSound.play().catch(e => {});
+                }
+                
+                updateUnreadBadges(unreadCounts);
+            });
+    }
+
+    function updateUnreadBadges(counts) {
+        document.querySelectorAll('#user-list li').forEach(li => {
+            const uid = li.getAttribute('data-uid');
+            const badge = li.querySelector('.unread-badge');
+            if (counts[uid] > 0 && uid !== selectedUserId) {
+                badge.textContent = counts[uid] > 9 ? '9+' : counts[uid];
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        });
+    }
+    
+    async function markMessagesAsRead(senderId) {
+        const chatId = [currentUser.uid, senderId].sort().join('_');
+        const snapshot = await db.collection('chats').doc(chatId).collection('messages')
+            .where('receiverId', '==', currentUser.uid)
+            .where('isRead', '==', false)
+            .get();
+        
+        const batch = db.batch();
+        snapshot.forEach(doc => {
+            batch.update(doc.ref, { isRead: true });
+        });
+        await batch.commit();
+    }
+</script>
+
+</body>
+</html>
